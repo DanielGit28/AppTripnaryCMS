@@ -1,10 +1,6 @@
 import { db } from "../../lib/firebase";
 import { createInteresesLugaresHandler } from "./interesesLugares";
 import { createInteresesRestaurantesHandler } from "./interesesRestaurantes";
-const { Configuration, OpenAIApi } = require("openai");
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
