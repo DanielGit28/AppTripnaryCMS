@@ -47,7 +47,6 @@ const getPromptByIdHandler = async (req, res) => {
     const Prompt = await PromptRef.get().then((snap) => snap.data())
     res.status(200).json(Prompt);
   } catch (e) {
-    console.error(e);
     res.status(500).end(JSON.stringify("Error al obtener el Prompt"));
   }
 };
@@ -77,7 +76,6 @@ const deletePromptHandler = async (req, res) => {
       res.status(200).end(JSON.stringify('Prompt eliminado correctamente'));
     }
   } catch (e) {
-    console.log('Erorr: ', e)
     res.status(500).end(JSON.stringify('Error eliminando el Prompt'))
   }
 }
@@ -114,7 +112,6 @@ const createPromptHandler = async (req, res) => {
       ...newPrompt,
       id: ref.id
     };
-    console.log('Ref prompt: ', Prompt)
 
     const interesBody = req.body
     interesBody.idPrompts = Prompt.id
@@ -138,12 +135,10 @@ const createPromptHandler = async (req, res) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer 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`
         },
         body: JSON.stringify(aiPrompt)
       });
       const data = await response.json();
-      console.log("Data ", data)
       if (!response.ok) {
         //throw new Error(data);
         contentAI = "Hubo un error con la AI"
@@ -154,8 +149,6 @@ const createPromptHandler = async (req, res) => {
       contentAI = "Hubo un error con la AI"
     }
     
-    console.log("IsJson: ", isJson(contentAI))
-    console.log("AI: ", contentAI)
 
     //Actualizar el plan de viaje con el id del interes lugar del usuario
     const planViajeSnapshot = db
@@ -174,7 +167,6 @@ const createPromptHandler = async (req, res) => {
     } else {
       planViaje.idInteresRestaurante = refIntereses.id
     }
-    //console.log("PLan viaje: ", planViaje)
     const updatedPlanViaje = await planViajeSnapshot.update(planViaje);
 
     //Guardar todas las recomendaciones que devuelve openAI segun la cantidad de dias
@@ -183,11 +175,8 @@ const createPromptHandler = async (req, res) => {
     }
 
     const response = isJson(contentAI) ? responseAIArrayJson(contentAI) : "Hubo un error con la AI"
-    console.log("Response", response)
-    //Deberia ir como JSON en string  
     res.status(200).json(response);
   } catch (e) {
-    console.error('Final error: ', e);
     res.status(500).end(e.message);
   }
 }
@@ -204,7 +193,6 @@ const saveIntereses = async (responseAI, refInteresesId, tipo) => {
         recomendacion.estado = "Activo"
         const refLugar = await db.collection('restaurantes_recomendados_ai').add(recomendacion)
       }
-      //console.log("Ref lugar: ",recomendacion, " id:", refLugar.id)
     })
   )
 }
@@ -217,7 +205,6 @@ const responseAIArrayJson = (responseAI) => {
       responseArray.push(recomendacion)
     })
   })
-  console.log("Response array ai: ", responseArray)
   return JSON.stringify(responseArray)
 }
 
@@ -247,11 +234,9 @@ const updatePromptHandler = async (req, res) => {
         tipo: data.tipo || Prompt.data().tipo,
       };
       await promptsnapshot.update(PromptActualizado);
-      console.log('Actualizado: ', PromptActualizado)
       res.status(200).end(JSON.stringify(PromptActualizado));
     }
   } catch (e) {
-    console.error(e);
     res.status(500).end(JSON.stringify(e.message));
   }
 };
